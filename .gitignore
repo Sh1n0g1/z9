@@ -1,0 +1,4 @@
+util/log/*.xml
+__pycache__/
+detection/__pycache__/
+detection/scripts/

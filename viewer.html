@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/a11y-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/powershell.min.js"></script>
+  <title>Z9 JSON Viewer</title>
+  <script>
+    function loadJSON(){
+      $("#result").show();
+      const alertData=JSON.parse($("#alert_data").val());
+      $("#num_of_logs").text(alertData.length);
+      let html="";
+      let isMalicious=false;
+      let totalscore=0;
+      for(a of alertData){
+        console.log(a);
+        html+="<tr>";
+        html+="<td>" + a.eventrecid + "</td>";
+        html+="<td>" + a.time.SystemTime + "</td>";
+        //Total Score
+        if(a.totalscore.totalscore >=100){
+          isMalicious=true;
+          html+='<td class="w3-red">' + Math.floor(a.totalscore.totalscore) + "</td>";
+          totalscore+=a.totalscore.totalscore;
+        }else{
+          html+='<td>' + Math.floor(a.totalscore.totalscore) + "</td>";
+        }
+        //URLs
+        html+="<td>";
+        for(u of a.url_result){
+          html+=u + '<br>';
+        }
+        html+="</td>";
+        //Suspicious String
+        html+="<td>";
+        if(a.detect_strings_blacklist.length>0){
+          html+='<table class="w3-table-all"><tr><th>String</th><th>Score</th></tr>';
+          for(b of a.detect_strings_blacklist){
+            html+='<tr><td>'+  b.keyword + '</td><td>' + b.score + '</td></tr>';
+          }
+          html+='</table>';
+        }
+        html+="</td>";
+        //IEX
+        html+="<td>";
+        if(a.detect_iex=="True"){
+          //html+="<";
+        }
+        html+=a.detect_iex;
+        html+="</td>";
+
+        //Symbols
+        html+="<td>" + a.detect_sign + "</td>";
+
+        //Randomized String
+        html+="<td>" + (Math.floor(a.unreadable_string * 100)) + "% </td>";
+        
+        //Source Code
+        
+        html+="<td>";
+        html+='<button class="w3-button w3-yellow" data-source="'+encodeURI(a.sourcecode)+'" onclick="openSourceCode(this)">View</button>';
+        html+='<button class="w3-button w3-orange" data-source="'+encodeURI(a.removed_backtick)+'" onclick="openSourceCode(this)"> without BackTick</button>';
+        html+="</td>";
+
+        html+="</tr>"
+      }
+      if(isMalicious){
+        $("#is_malicious").text("Yes");
+        $("#is_malicious").addClass("w3-red");
+      }else{
+        $("#is_malicious").text("No");
+        $("#is_malicious").removeClass("w3-red");
+      }
+
+      $("#malicious_score").text(Math.floor(totalscore));
+
+      $("#log_details").append(html);
+    }
+    function openSourceCode(e){
+      const sourcecode=decodeURI($(e).data('source'));
+      $("#sourcecode").text(sourcecode);
+      
+      hljs.highlightAll();
+      $([document.documentElement, document.body]).animate({
+        scrollTop: $("#sourcecode").offset().top
+    }, 1000);
+    }
+  </script>
+</head>
+<body>
+  <div class="w3-bar w3-black">
+    <a href="#" class="w3-bar-item w3-button">Z9 JSON Viewer</a>
+  </div>
+  <div class="w3-panel">
+    <textarea  id="alert_data" cols="120" rows="3" placeholder="Paste JSON data here."></textarea><br>
+    <button class="w3-button w3-black" onclick="loadJSON()">Load JSON</button>
+  </div>
+  <div id="result" class="w3-panel" style="display:none;">
+    <h3>Summary</h3>
+      <table class="w3-table w3-third">
+        <tr>
+          <th>Num of Logs</th>
+          <td><span  class="w3-padding" id="num_of_logs"></span></td>
+        </tr>
+        <tr>
+          <th>Malicious Script Detected</th>
+          <td><span class="w3-padding" id="is_malicious"></span></td>
+        </tr>
+        <tr>
+          <th>Malicious Score</th>
+          <td><span class="w3-padding" id="malicious_score"></span></td>
+        </tr>
+      </table><br clear="all">
+    <h3>Details</h3>
+    <table id="log_details" class="w3-table-all">
+      <tr>
+      <th>ID</th>
+      <th>Time</th>
+      <th>Score</th>
+      <th>URLs</th>
+      <th>Suspicious<br>Strings</th>
+      <th>IEX</th>
+      <th>Too much<br>Symbols</th>
+      <th>Randomized String</th>
+      <th>Source Code</th>
+      <th></th>
+      </tr>
+    </table>
+    <h3>Source Code</h3>
+    <pre><code class="language-powershell" id="sourcecode"></code></pre>
+  </div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+DefineDynamicAssembly,5
+DefineDynamicModule,5
+DefineType,5
+DefineConstructor,5
+CreateType,5
+DefineLiteral,5
+DefineEnum,5
+DefineField,5
+ILGenerator,100
+Emit,0
+UnverifiableCodeAttribute,5
+DefinePInvokeMethod,5
+GetTypes,5
+GetAssemblies,100
+Methods,0
+Properties,0
+GetConstructor,5
+GetConstructors,5
+GetDefaultMembers,5
+GetEvent,5
+GetEvents,5
+GetField,5
+GetFields,5
+GetInterface,5
+GetInterfaceMap,5
+GetInterfaces,5
+GetMember,5
+GetMembers,5
+GetMethod,5
+GetMethods,5
+GetNestedType,5
+GetNestedTypes,5
+GetProperties,5
+GetProperty,5
+InvokeMember,5
+MakeArrayType,5
+MakeByRefType,5
+MakeGenericType,5
+MakePointerType,5
+DeclaringMethod,5
+DeclaringType,5
+ReflectedType,5
+TypeHandle,5
+TypeInitializer,5
+UnderlyingSystemType,5
+InteropServices,10
+Marshal,10
+AllocHGlobal,10
+PtrToStructure,10
+StructureToPtr,10
+FreeHGlobal,10
+IntPtr,10
+MemoryStream,10
+DeflateStream,10
+FromBase64String,10
+EncodedCommand,10
+Bypass,10
+ToBase64String,10
+ExpandString,10
+GetPowerShell,10
+OpenProcess,15
+VirtualAlloc,15
+VirtualFree,15
+WriteProcessMemory,15
+CreateUserThread,15
+CloseHandle,15
+GetDelegateForFunctionPointer,15
+kernel32,15
+CreateThread,15
+memcpy,15
+LoadLibrary,15
+GetModuleHandle,15
+GetProcAddress,15
+VirtualProtect,15
+FreeLibrary,15
+ReadProcessMemory,15
+CreateRemoteThread,15
+AdjustTokenPrivileges,15
+WriteByte,15
+WriteInt32,15
+OpenThreadToken,15
+PtrToString,15
+ZeroFreeGlobalAllocUnicode,15
+OpenProcessToken,15
+GetTokenInformation,15
+SetThreadToken,15
+ImpersonateLoggedOnUser,15
+RevertToSelf,15
+GetLogonSessionData,15
+CreateProcessWithToken,15
+DuplicateTokenEx,15
+OpenWindowStation,15
+OpenDesktop,15
+MiniDumpWriteDump,15
+AddSecurityPackage,15
+EnumerateSecurityPackages,15
+GetProcessHandle,15
+DangerousGetHandle,15
+CryptoServiceProvider,20
+Cryptography,20
+RijndaelManaged,20
+SHA1Managed,20
+CryptoStream,20
+CreateEncryptor,20
+CreateDecryptor,20
+TransformFinalBlock,20
+DeviceIoControl,20
+SetInformationProcess,20
+PasswordDeriveBytes,20
+GetAsyncKeyState,100
+GetKeyboardState,100
+GetForegroundWindow,100
+BindingFlags,5
+NonPublic,5
+ScriptBlockLogging,100
+LogPipelineExecutionDetails,100
+ProtectedEventLogging,100
+DownloadDataCompleted ,10
+DownloadFileCompleted ,10
+DownloadProgressChanged ,10
+DownloadStringCompleted ,10
+OpenReadCompleted ,10
+OpenWriteCompleted ,10
+UploadDataCompleted ,10
+UploadFileCompleted ,10
+UploadProgressChanged ,10
+UploadStringCompleted ,10
+UploadValuesCompleted ,10
+WriteStreamClosed ,10
+DownloadData ,10
+DownloadDataAsync ,10
+DownloadDataTaskAsync ,10
+DownloadFile ,10
+DownloadFileAsync ,10
+DownloadFileTaskAsync ,10
+DownloadString ,10
+DownloadStringAsync ,10
+DownloadStringTaskAsync ,10
+UploadData ,10
+UploadDataAsync ,10
+UploadDataTaskAsync ,10
+UploadFile ,10
+UploadFileAsync ,10
+UploadFileTaskAsync ,10
+UploadString ,10
+UploadStringAsync ,10
+UploadStringTaskAsync ,10
+UploadValues ,10
+UploadValuesAsync ,10
+UploadValuesTaskAsync ,10
+Diagnostics.Process,15
+mimikatz,100
+cve,50
+MS10015,100
+MS10092,100
+MS13053,100
+MS13081,100
+MS14058,100
+MS15051,100
+MS15078,100
+MS16016,100
+MS16032,100
+MS16034,100
+MS16135,100
+CredentialInjection,100
+ReflectivePEInjection,100
+Enable-SeDebugPrivilege,100
+Update-MemoryProtectionFlags,100
+NinjaCopy,100
+PowerSploit ,100
+CompressedCommand,10
+EncodedAsciiCommand,10
+EncodedBXORCommand,10
+EncodedBinaryCommand,10
+EncodedHexCommand,10
+EncodedOctalCommand,10
+EncodedSpecialCharOnlyCommand,10
+SecureStringCommand,20
+Exfiltration,100
+Recon,100
+Invoke-ConPtyShell,100
+PowerShell-Suite,100
+kernel32.dll,15
+DllImport,15
+Empire,100
+Invoke-PowerShellTcp,100
+Invoke-PoshRatHttps,100
+Backdoor,100
+PowerUp,100
+obfuscation,100
+obfuscated,100

@@ -1,0 +1,202 @@
+[
+    {
+        "eventrecid": "1766",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:00.457851400Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(PSConsoleHostReadLine): \"PSConsoleHostReadLine\"\n",
+        "removed_backtick": "CommandInvocation(PSConsoleHostReadLine): \"PSConsoleHostReadLine\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1767",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:00.458738400Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": ".\\check-cpu.ps1",
+        "removed_backtick": ".\\check-cpu.ps1",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1770",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:01.842206800Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(Test-Path): \"Test-Path\"\nParameterBinding(Test-Path): name=\"PathType\"; value=\"Leaf\"\nParameterBinding(Test-Path): name=\"Path\"; value=\"/sys/class/thermal/thermal_zone0/temp\"\n",
+        "removed_backtick": "CommandInvocation(Test-Path): \"Test-Path\"\nParameterBinding(Test-Path): name=\"PathType\"; value=\"Leaf\"\nParameterBinding(Test-Path): name=\"Path\"; value=\"/sys/class/thermal/thermal_zone0/temp\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1771",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:01.854962400Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(Get-WmiObject): \"Get-WmiObject\"\nParameterBinding(Get-WmiObject): name=\"Query\"; value=\"SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation\"\nParameterBinding(Get-WmiObject): name=\"Namespace\"; value=\"root/CIMV2\"\n",
+        "removed_backtick": "CommandInvocation(Get-WmiObject): \"Get-WmiObject\"\nParameterBinding(Get-WmiObject): name=\"Query\"; value=\"SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation\"\nParameterBinding(Get-WmiObject): name=\"Namespace\"; value=\"root/CIMV2\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1773",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:02.769390400Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(New-Object): \"New-Object\"\nParameterBinding(New-Object): name=\"ComObject\"; value=\"SAPI.SPVoice\"\n",
+        "removed_backtick": "CommandInvocation(New-Object): \"New-Object\"\nParameterBinding(New-Object): name=\"ComObject\"; value=\"SAPI.SPVoice\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1777",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:02.776803500Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\" \u2190 CPU is 0\u00b0C cold.\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"\u26a0\ufe0f Error in line 35: Exception from HRESULT: 0x8004503A\"\n",
+        "removed_backtick": "CommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\" \u2190 CPU is 0\u00b0C cold.\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"\u26a0\ufe0f Error in line 35: Exception from HRESULT: 0x8004503A\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1780",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:02.777964400Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "prompt",
+        "removed_backtick": "prompt",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    },
+    {
+        "eventrecid": "1786",
+        "time": {
+            "SystemTime": "2022-08-10T10:51:02.778690900Z"
+        },
+        "totalscore": {
+            "totalscore": 0,
+            "results": {
+                "detect_iex": 0,
+                "extract_url": 0,
+                "detect_sign": 0,
+                "unreadable_string": 0,
+                "detect_strings_blacklist": 0,
+                "logistic_reg": 0
+            }
+        },
+        "sourcecode": "CommandInvocation(Set-StrictMode): \"Set-StrictMode\"\nParameterBinding(Set-StrictMode): name=\"Off\"; value=\"True\"\n",
+        "removed_backtick": "CommandInvocation(Set-StrictMode): \"Set-StrictMode\"\nParameterBinding(Set-StrictMode): name=\"Off\"; value=\"True\"\n",
+        "detect_iex": false,
+        "url_result": [],
+        "detect_sign": 0,
+        "unreadable_string": 0,
+        "detect_strings_blacklist": [],
+        "logistic_reg": 0
+    }
+]
