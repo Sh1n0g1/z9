@@ -11,9 +11,13 @@ This tools detects the artifact of the PowerShell based malware from the eventlo
 [https://z9.shino.club/](https://z9.shino.club/)
 * including Sandbox
 
+## Requirement
+Python 3+
+
 ## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
+pip install -r requirements.txt
 ```
 
 ## How to use
