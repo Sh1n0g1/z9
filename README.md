@@ -17,6 +17,7 @@ Python 3+
 ## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
+cd z9
 pip install -r requirements.txt
 ```
 
