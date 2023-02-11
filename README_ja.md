@@ -5,9 +5,14 @@
 ## 概要
 PowerShellロギングのイベントログのXMLファイルからマルウェアが実行された痕跡を検出するスクリプトです。
 
+## 必要要件
+Python 3+
+
 ## インストール
 ```
 git clone https://github.com/Sh1n0g1/z9
+cd z9
+pip install -r requirements.txt
 ```
 
 ## オンラインデモ
