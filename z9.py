@@ -1,70 +1,114 @@
-import sys
 import os.path
 import xml.etree.ElementTree as ET
 import json
 from detection import extract_url, detect_sign, detect_iex, detect_strings_blacklist, detect_randomized_string,logistic_reg
+from preprocess import source_context
 import score
 import raise_alert
-import remove_backtick
+import argparse
+import datetime
 
 
 DEBUG=False
 
-def main(xmlfilename, jsonfilename=""):
+class Z9:
+  def __init__(self,sources):
+    self.sources = sources
+    self.report = []
+    self.source_context = source_context.SourceContext()
+    self.engines = []
+    self.engines.append(detect_iex.DetectIEX(weight=100))
+    self.engines.append(extract_url.ExtractURL(weight=20))
+    self.engines.append(detect_sign.DetectSign(weight=250))
+    self.engines.append(logistic_reg.LogisticReg(weight=100))
+    self.engines.append(detect_randomized_string.DetectRandomizedString(weight=400))
+    self.engines.append(detect_strings_blacklist.DetectStringsBlacklist(weight=1))
+    
+  def run_detection(self):
+    
+    for source in self.sources:
+      #preprocessing
+      self.source_context.preprocess(source["sourcecode"])
+      all_results = {}
+      all_results["eventrecid"] = source['eventrecid']
+      all_results["time"] = source['time']
+      all_results["totalscore"] = {}
+      all_results["sourcecode"] = self.source_context.source
+      all_results["removed_backtick"] = self.source_context.removed_backtick
+
+      scores = {}
+      total_score = 0
+      results = {}
+      errors = {}
+
+      for engine in self.engines:
+
+        engine.init()
+
+        engine.run_detection(self.source_context)
+
+        scores[engine.name] = engine.get_score()
+        total_score += engine.get_score()
+        results[engine.name] = engine.get_result()
+        error = engine.get_error()
+        if error:
+          errors[engine.name] = error
+
+
+      all_results["totalscore"]["totalscore"] = total_score
+      all_results["totalscore"]["score"] = scores
+      all_results["error"] = errors
+      all_results.update(results)
+
+      self.report.append(all_results)
+
+
+  def json_dump(self,jsonfilename=""):
+    with open(jsonfilename,'w') as f:
+      json.dump(self.report,f)
+    
+
+
+
+      
+
+
+
+def z9_dynamic(xmlfilename, jsonfilename=""):
   #Extract Sourcecode from XML
   sources=get_eventlog(xmlfilename)
   
-  alert_data=[]
-  for source in sources:
-    
-    sourcecode=source['sourcecode']
-    time=source['time']
-    eventrecid=source['eventrecid']
-    
-    #preprocessing
-    removed_backtick=remove_backtick.remove_backtick(sourcecode)
-    #detection engines
-    detect_iex_result=detect_iex.detect_iex(removed_backtick) #True or False
-    url_result=extract_url.extract_url(removed_backtick)
-    detect_sign_result=detect_sign.detect_sign(sourcecode)
-    detect_randomized_string_result=detect_randomized_string.detect_randomized_string(sourcecode)
-    detect_strings_blacklist_result=detect_strings_blacklist.detect_strings_blacklist(removed_backtick)
-    logistic_reg_result = logistic_reg.logistic_reg(removed_backtick)
-    
-    all_results={
-      "detect_iex":detect_iex_result,
-      "extract_url":url_result,
-      "detect_sign":detect_sign_result,
-      "unreadable_string":detect_randomized_string_result,
-      "detect_strings_blacklist":detect_strings_blacklist_result,
-      "logistic_reg":logistic_reg_result
-    }
-    totalscore=score.score(all_results)
-    if DEBUG or totalscore["totalscore"] >=100:
-      raise_alert.raise_alert(time, sourcecode, url_result, totalscore)
-
-    if DEBUG:
-      input()
-    #Prepare JSON DATA
-    if jsonfilename!='':
-      alert_data.append({
-        "eventrecid":eventrecid,
-        "time":time,
-        "totalscore":totalscore,
-        "sourcecode":sourcecode,
-        "removed_backtick":removed_backtick,
-        "detect_iex":detect_iex_result,
-        "url_result":url_result,
-         "detect_sign":detect_sign_result,
-        "unreadable_string":detect_randomized_string_result,
-        "detect_strings_blacklist":detect_strings_blacklist_result,
-        "logistic_reg":logistic_reg_result,
-      })
+  z9 = Z9(sources)
+  z9.run_detection()
   if jsonfilename!='':
-    #Create JSON file
-    with open(jsonfilename,'w') as f:
-      json.dump(alert_data,f)
-      
+    z9.json_dump(jsonfilename)
+
+def z9_static(sourcefile,jsonfilename="",encoding="utf-16"):
+  #Read script from script file
+  source = get_script(sourcefile,encoding)
+  sourcecode = {}
+  sourcecode["sourcecode"] = source
+  sourcecode["time"] = {"SystemTime" : datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f000Z%Z')}
+  sourcecode["eventrecid"] = 0
+  z9 = Z9([sourcecode])
+  z9.run_detection()
+  if jsonfilename!='':
+    z9.json_dump(jsonfilename)
+
+
+def get_script(sourcefile,encoding):
+  if os.path.isfile(sourcefile):
+    try:
+        with open(sourcefile,"r",encoding) as f:
+            sourcecode = f.read()
+    except:
+      print("File read error")
+      print("If the file exists, check the encoding")
+      exit()
+    return sourcecode
+  else:
+    print("file not found")
+    exit()
 
 def get_eventlog(filename):
   if not os.path.isfile(filename):
@@ -100,17 +144,15 @@ if __name__ == '__main__':
  /  /_. / /  / /  / /  / /  / /  / /  / /  / /  \__. |
 /_____|/___|/___|/___|/___|/___|/___|/___|/___|   /_/ 
 ''')
-  if(len(sys.argv) < 2):
-    print("Usage: python z9.py <xml filepath>\n")
-    print("Usage: python z9.py <xml filepath> <output json filename>\n")
-    print("Example: python z9.py .\\util\\log\\mwpsop.xml result.json")
-    exit()
-  elif(len(sys.argv)==2):
-    xmlfilename=sys.argv[1]
-    main(xmlfilename)
-  elif(len(sys.argv)==3):
-    xmlfilename=sys.argv[1]
-    jsonfilename=sys.argv[2]
-    main(xmlfilename, jsonfilename)
-  main(sys.argv[1])
-  
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-s","--static",help="enable Static Analysis mode",action='store_true')
+  parser.add_argument("sourcefile")
+  parser.add_argument("-j","--json",help="output report")
+  parser.add_argument("--utf8",help="read scriptfile in utf-8 ",action="store_true")
+  args = parser.parse_args()
+  if args.static:
+    print("called static")
+    z9_static(args.sourcefile,args.json if args.json else "",args.utf8 if "utf-8" else "utf-16")
+  else:
+    print("called dynamic")
+    z9_dynamic(args.sourcefile,args.json if args.json else "")
