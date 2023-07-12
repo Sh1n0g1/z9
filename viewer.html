@@ -10,6 +10,49 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/powershell.min.js"></script>
   <title>Z9 JSON Viewer</title>
+  <style>
+    .modal{
+      width: 90%;
+      height:95%;
+      margin:auto;
+      position: fixed;
+      left:5%;
+      top:5%;
+      overflow: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .modal::-webkit-scrollbar {
+      display: none;
+    }
+    .modal-content{
+      background-color: #fff;
+      position: relative;
+      padding: 0;
+      outline: 0;
+    }
+    .modal-header{
+      position: sticky;
+      top:0;
+      height: 4.5rem;
+      background-color: #fff;
+    }
+    #modal-wrapper{
+      position: fixed;
+      left: 0; 
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display:none;
+      background-color: rgba(0,0,0,0.4);
+    }
+    #copy{
+      font-size: large;
+      position: absolute;
+      right: 4rem;
+      top:0;
+    }
+  </style>
   <script>
     function loadJSON(){
       $("#result").show();
@@ -31,6 +74,15 @@
         }else{
           html+='<td>' + Math.floor(a.totalscore.totalscore) + "</td>";
         }
+        //Logistic_Reg
+
+        if(a.logistic_reg >= 0.5){
+          isMalicious=true;
+          html+='<td class="w3-red">' + Math.floor(a.logistic_reg * 100) + "%</td>";
+          totalscore+=a.totalscore.totalscore;
+        }else{
+          html+='<td>' + Math.floor(a.logistic_reg * 100) + "%</td>";
+        }
         //URLs
         html+="<td>";
         for(u of a.url_result){
@@ -49,21 +101,21 @@
         html+="</td>";
         //IEX
         html+="<td>";
-        if(a.detect_iex=="True"){
-          //html+="<";
+        if(a.detect_iex){
+          html+='<span class="w3-red">Founded</span>';
         }
-        html+=a.detect_iex;
         html+="</td>";
 
         //Symbols
-        html+="<td>" + a.detect_sign + "</td>";
+        html+="<td>" + (Math.floor(a.detect_sign * 100)) + "% </td>";
 
         //Randomized String
-        html+="<td>" + (Math.floor(a.unreadable_string * 100)) + "% </td>";
+        html+="<td>" + (Math.floor(a.randomized_string * 100)) + "% </td>";
         
         //Source Code
         
         html+="<td>";
+        html+="Length:"+a.sourcecode.length+'<br>';
         html+='<button class="w3-button w3-yellow" data-source="'+encodeURI(a.sourcecode)+'" onclick="openSourceCode(this)">View</button>';
         html+='<button class="w3-button w3-orange" data-source="'+encodeURI(a.removed_backtick)+'" onclick="openSourceCode(this)"> without BackTick</button>';
         html+="</td>";
@@ -83,13 +135,29 @@
       $("#log_details").append(html);
     }
     function openSourceCode(e){
+      const modal = document.getElementById('modal-wrapper');
+      const copyButton = document.getElementById('copy');
+      modal.style.display='block';
+      modal.addEventListener("click",closeSourceCode);
+      copyButton.addEventListener("click",copy);
+      
       const sourcecode=decodeURI($(e).data('source'));
       $("#sourcecode").text(sourcecode);
       
       hljs.highlightAll();
-      $([document.documentElement, document.body]).animate({
-        scrollTop: $("#sourcecode").offset().top
-    }, 1000);
+    }
+    function closeSourceCode(){
+      if(event.target.closest('.modal-content') === null) {
+        document.getElementById("modal-wrapper").style.display="none";
+      }
+    }
+
+    function copy(){
+      navigator.clipboard.writeText(document.getElementById("sourcecode").innerText);
+      console.log(document.getElementById("sourcecode").innerText);
+      const target = event.target;
+      target.innerHTML = 'Copied!';
+      setTimeout(() => target.innerHTML = 'Copy', 1500);
     }
   </script>
 </head>
@@ -123,6 +191,7 @@
       <th>ID</th>
       <th>Time</th>
       <th>Score</th>
+      <th>Logistic<br>Regression</th>
       <th>URLs</th>
       <th>Suspicious<br>Strings</th>
       <th>IEX</th>
@@ -132,8 +201,20 @@
       <th></th>
       </tr>
     </table>
-    <h3>Source Code</h3>
-    <pre><code class="language-powershell" id="sourcecode"></code></pre>
+    <div id="modal-wrapper">
+      <div class="modal">
+        <div class="modal-content">
+          <div class="w3-container modal-header">
+            <span id="copy" onclick="copy()" class="w3-button">Copy</span>
+            <span onclick="document.getElementById('modal-wrapper').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+            <h3>Source Code</h3>
+          </div>
+          <div class="w3-container">
+            <pre><code class="language-powershell" id="sourcecode"></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
