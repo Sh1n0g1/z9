@@ -3,8 +3,6 @@ import xml.etree.ElementTree as ET
 import json
 from detection import extract_url, detect_sign, detect_iex, detect_strings_blacklist, detect_randomized_string,logistic_reg
 from preprocess import source_context
-import score
-import raise_alert
 import argparse
 import datetime
 
@@ -99,11 +97,12 @@ def z9_static(sourcefile,jsonfilename="",encoding="utf-16"):
 def get_script(sourcefile,encoding):
   if os.path.isfile(sourcefile):
     try:
-        with open(sourcefile,"r",encoding) as f:
+        with open(sourcefile,"r",encoding = encoding) as f:
             sourcecode = f.read()
-    except:
+    except Exception as e:
       print("File read error")
       print("If the file exists, check the encoding")
+      print(e)
       exit()
     return sourcecode
   else:
@@ -145,14 +144,18 @@ if __name__ == '__main__':
 /_____|/___|/___|/___|/___|/___|/___|/___|/___|   /_/ 
 ''')
   parser = argparse.ArgumentParser()
-  parser.add_argument("-s","--static",help="enable Static Analysis mode",action='store_true')
-  parser.add_argument("sourcefile")
-  parser.add_argument("-j","--json",help="output report")
-  parser.add_argument("--utf8",help="read scriptfile in utf-8 ",action="store_true")
+  parser.add_argument("sourcefile", help="Input file path")
+  parser.add_argument("--output", "-o", help="Output file path", default="output.json")
+  parser.add_argument("-s", "--static", help="Enable Static Analysis mode", action="store_true")
+  parser.add_argument("--utf8", help="Read scriptfile in utf-8 (deprecated)", action="store_true")
   args = parser.parse_args()
+
   if args.static:
-    print("called static")
-    z9_static(args.sourcefile,args.json if args.json else "",args.utf8 if "utf-8" else "utf-16")
+      print("Called static")
+      z9_static(args.sourcefile, args.output, "utf-8" if args.utf8 else "utf-16")
   else:
-    print("called dynamic")
-    z9_dynamic(args.sourcefile,args.json if args.json else "")
+      if args.utf8:
+          print("Warning: --utf8 option is only valid with -s option.")
+          exit()
+      print("Called dynamic")
+      z9_dynamic(args.sourcefile, args.output)
