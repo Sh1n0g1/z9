@@ -1,70 +1,130 @@
-import sys
 import os.path
 import xml.etree.ElementTree as ET
 import json
 from detection import extract_url, detect_sign, detect_iex, detect_strings_blacklist, detect_randomized_string,logistic_reg
-import score
-import raise_alert
-import remove_backtick
+from preprocess import source_context
+import argparse
+import datetime
+import webbrowser
+import re
+import tempfile
+import time
 
 
 DEBUG=False
 
-def main(xmlfilename, jsonfilename=""):
-  #Extract Sourcecode from XML
-  sources=get_eventlog(xmlfilename)
-  
-  alert_data=[]
-  for source in sources:
+class Z9:
+  def __init__(self,sources):
+    self.sources = sources
+    self.report = []
+    self.source_context = source_context.SourceContext()
+    self.engines = []
+    self.engines.append(detect_iex.DetectIEX(weight=100))
+    self.engines.append(extract_url.ExtractURL(weight=20))
+    self.engines.append(detect_sign.DetectSign(weight=250))
+    self.engines.append(logistic_reg.LogisticReg(weight=100))
+    self.engines.append(detect_randomized_string.DetectRandomizedString(weight=400))
+    self.engines.append(detect_strings_blacklist.DetectStringsBlacklist(weight=1))
     
-    sourcecode=source['sourcecode']
-    time=source['time']
-    eventrecid=source['eventrecid']
+  def run_detection(self):
     
-    #preprocessing
-    removed_backtick=remove_backtick.remove_backtick(sourcecode)
-    #detection engines
-    detect_iex_result=detect_iex.detect_iex(removed_backtick) #True or False
-    url_result=extract_url.extract_url(removed_backtick)
-    detect_sign_result=detect_sign.detect_sign(sourcecode)
-    detect_randomized_string_result=detect_randomized_string.detect_randomized_string(sourcecode)
-    detect_strings_blacklist_result=detect_strings_blacklist.detect_strings_blacklist(removed_backtick)
-    logistic_reg_result = logistic_reg.logistic_reg(removed_backtick)
-    
-    all_results={
-      "detect_iex":detect_iex_result,
-      "extract_url":url_result,
-      "detect_sign":detect_sign_result,
-      "unreadable_string":detect_randomized_string_result,
-      "detect_strings_blacklist":detect_strings_blacklist_result,
-      "logistic_reg":logistic_reg_result
-    }
-    totalscore=score.score(all_results)
-    if DEBUG or totalscore["totalscore"] >=100:
-      raise_alert.raise_alert(time, sourcecode, url_result, totalscore)
+    for source in self.sources:
+      self.source_context.preprocess(source["sourcecode"])
+      all_results = {}
+      all_results["eventrecid"] = source['eventrecid']
+      all_results["time"] = source['time']
+      all_results["totalscore"] = {}
+      all_results["sourcecode"] = self.source_context.source
+      all_results["removed_backtick"] = self.source_context.removed_backtick
 
-    if DEBUG:
-      input()
-    #Prepare JSON DATA
-    if jsonfilename!='':
-      alert_data.append({
-        "eventrecid":eventrecid,
-        "time":time,
-        "totalscore":totalscore,
-        "sourcecode":sourcecode,
-        "removed_backtick":removed_backtick,
-        "detect_iex":detect_iex_result,
-        "url_result":url_result,
-         "detect_sign":detect_sign_result,
-        "unreadable_string":detect_randomized_string_result,
-        "detect_strings_blacklist":detect_strings_blacklist_result,
-        "logistic_reg":logistic_reg_result,
-      })
-  if jsonfilename!='':
-    #Create JSON file
+      scores = {}
+      total_score = 0
+      results = {}
+      errors = {}
+
+      for engine in self.engines:
+
+        engine.init()
+
+        engine.run_detection(self.source_context)
+
+        scores[engine.name] = engine.get_score()
+        total_score += engine.get_score()
+        results[engine.name] = engine.get_result()
+        error = engine.get_error()
+        if error:
+          errors[engine.name] = error
+
+
+      all_results["totalscore"]["totalscore"] = total_score
+      all_results["totalscore"]["score"] = scores
+      all_results["error"] = errors
+      all_results.update(results)
+
+      self.report.append(all_results)
+
+
+  def json_dump(self,jsonfilename=""):
     with open(jsonfilename,'w') as f:
-      json.dump(alert_data,f)
+      json.dump(self.report,f)
+    
+
+
+
       
+
+
+
+def z9_dynamic(xmlfilename, jsonfilename=""):
+  #Extract Sourcecode from XML
+  try:
+    sources=get_eventlog(xmlfilename)
+  except Exception as e:
+    print(f"xml parse error :{str(e)}")
+    if jsonfilename!='':
+      with open(jsonfilename,'w') as f:
+        report = []
+        report.append({"error" : f"xml parse error :{str(e)}"})
+        json.dump(report,f)
+    return False
+
+  z9 = Z9(sources)
+  z9.run_detection()
+  if jsonfilename!='':
+    z9.json_dump(jsonfilename)
+
+def z9_static(sourcefile,jsonfilename="",encoding="utf-16"):
+  #Read script from script file
+  try:
+    source = get_script(sourcefile,encoding)
+  except Exception as e:
+    print(f"Failed to open the file :{str(e)}")
+    if jsonfilename!='':
+      with open(jsonfilename,'w') as f:
+        report = []
+        report.append({"error" : f"Failed to open the file :{str(e)}"})
+        json.dump(report,f)
+    return False
+  sourcecode = {}
+  sourcecode["sourcecode"] = source
+  sourcecode["time"] = {"SystemTime" : datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f000Z%Z')}
+  sourcecode["eventrecid"] = 0
+  z9 = Z9([sourcecode])
+  z9.run_detection()
+  if jsonfilename!='':
+    z9.json_dump(jsonfilename)
+
+
+def get_script(sourcefile,encoding):
+  if os.path.isfile(sourcefile):
+    try:
+        with open(sourcefile,"r",encoding=encoding) as f:
+            sourcecode = f.read()
+    except:
+      raise 
+    return sourcecode
+  else:
+    raise Exception("file not found")
 
 def get_eventlog(filename):
   if not os.path.isfile(filename):
@@ -92,6 +152,39 @@ def get_eventlog(filename):
         sources.append({"sourcecode":ps[0].text, "time":time, "eventrecid": eventrecid})
   return sources
 
+def open_viewer_html(viewer, jsonfilename):
+    if not (os.path.isfile(viewer) and os.path.isfile(jsonfilename)):
+        print("File not found")
+        exit(1)
+
+    try:
+        with open(viewer, "r") as f_html, open(jsonfilename, "r") as f_json:
+            html = f_html.read()
+            json_data = f_json.read()
+
+            textarea_pattern = r'(<textarea[^>]*id="alert_data"[^>]*>)([\s\S]*?)(<\/textarea>)'
+            match = re.search(textarea_pattern, html, re.IGNORECASE)
+            if match:
+                
+                start_tag = match.group(1)
+                end_tag = match.group(3)
+                
+                replacement = f'{start_tag}{json_data}{end_tag}'
+                replaced_html = html.replace(match.group(0), replacement)
+
+                with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".html") as temp_file:
+                    temp_file.write(replaced_html)
+                    temp_file_path = temp_file.name
+
+                webbrowser.open_new(temp_file_path)
+
+                time.sleep(3)
+                os.remove(temp_file_path)
+
+    except Exception as e:
+        print("Error:", e)
+
+
 if __name__ == '__main__':
   print('''
  ______                                          ___  
@@ -100,17 +193,27 @@ if __name__ == '__main__':
  /  /_. / /  / /  / /  / /  / /  / /  / /  / /  \__. |
 /_____|/___|/___|/___|/___|/___|/___|/___|/___|   /_/ 
 ''')
-  if(len(sys.argv) < 2):
-    print("Usage: python z9.py <xml filepath>\n")
-    print("Usage: python z9.py <xml filepath> <output json filename>\n")
-    print("Example: python z9.py .\\util\\log\\mwpsop.xml result.json")
-    exit()
-  elif(len(sys.argv)==2):
-    xmlfilename=sys.argv[1]
-    main(xmlfilename)
-  elif(len(sys.argv)==3):
-    xmlfilename=sys.argv[1]
-    jsonfilename=sys.argv[2]
-    main(xmlfilename, jsonfilename)
-  main(sys.argv[1])
+  parser = argparse.ArgumentParser()
+  parser.add_argument("input", help="Input file path")
+  parser.add_argument("--output", "-o", help="Output file path", default="output.json")
+  parser.add_argument("-s", "--static", help="Enable Static Analysis mode", action="store_true")
+  parser.add_argument("--no-viewer", help="Disable opening the JSON viewer in a web browser", action="store_true")
   
+  parser.add_argument("--utf8", help="Read scriptfile in utf-8 (deprecated)", action="store_true")
+  args = parser.parse_args()
+
+  if args.static:
+      print("Called static")
+      z9_static(args.input, args.output, "utf-8" if args.utf8 else "utf-16")
+  else:
+      if args.utf8:
+          print("Warning: --utf8 option is only valid with -s option.")
+          exit()
+      print("Called dynamic")
+      z9_dynamic(args.input, args.output)
+
+  if not args.no_viewer:
+    try:
+      open_viewer_html("./viewer.html",args.output)
+    except Exception as e:
+       print(str(e))
