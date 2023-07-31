@@ -1,17 +1,18 @@
 # z9 PowerShell Log Analyzer
-[English](./README-en.md)
+
+[Japanese](./README.md)
+
 ![Z9 Logo](./img/logo.png)
 
-## 概要
-PowerShellロギングのイベントログのXMLファイルからマルウェアが実行された痕跡を検出するスクリプトです。
+## Abstract
+This tools detects the artifact of the PowerShell based malware from the eventlog of PowerShell logging.
 
-## インストール
+## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
 ```
 
-## 使い方
-
+## How to use
 ```
 usage: z9.py [-h] [--output OUTPUT] [-s] [--no-viewer] [--utf8] input
 
@@ -28,58 +29,58 @@ options:
 ```
 
 
-### イベントログファイルを解析する（推奨）
+### Analyze Event Logs (Recommended)
 ```
-python z9.py <入力ファイル> -o <出力JSONファイル名>
-python z9.py <入力ファイル> -o <出力JSONファイル名> --no-viewer
+python z9.py <input file> -o <output json>
+python z9.py <input file> -o <output json> --no-viewer
 ```
-|パラメータ               |       意味                             |
+|Arguments               |       Meaning                             |
 |-------------------------|----------------------------------------|
-|`入力ファイル`            |イベントログからエクスポートしたXMLファイル |
-|`-o 出力JSONファイル名`   |z9の出力結果のファイル名                  |
-|`--no-viewer `           |ビューワを起動しない                      |
+|`input file`            |XML file exported from eventlog          |
+|`-o output json`        |filename of z9 result                    |
+|`--no-viewer `          |do not open the viewer                   |
 
-例)
+Example)
 ```
 python z9.py util\log\mwpsop.xml -o sample1.json
 ```
 
-### PowerShellスクリプトのファイルを静的に解析する
+### Analyze PowerShell File Statically
+* This approach will only do the static analysis and may not provide a proper result especially when the sample is obfuscated.
 ```
-python z9.py <入力ファイル> -o <出力JSONファイル名> -s
-python z9.py <入力ファイル> -o <出力JSONファイル名> -s --utf8
-python z9.py <入力ファイル> -o <出力JSONファイル名> -s --no-viewer
+python z9.py <入力ファイル> -o <output json> -s
+python z9.py <入力ファイル> -o <output json> -s --utf8
+python z9.py <入力ファイル> -o <output json> -s --no-viewer
 ```
-|パラメータ               |       意味                             |
+|Arguments               |       Meaning                             |
 |-------------------------|----------------------------------------|
-|`入力ファイル`            |PowerShellスクリプト(*.ps1）　　　　　　　 |
-|`-o 出力JSONファイル名`   |z9の出力結果のファイル名                  |
-|`-s`                     |静的解析を実行する                       |
+|`input file`            |PowerShell file to be analyzed           |
+|`-o output json`        |filename of z9 result                    |
+|`-s`                     |perform static analysis                      |
 |`--utf8`                 |入力ファイルが`UTF-8`の時に指定する       |
-|`--no-viewer `           |ビューワを起動しない                      |
+|`--no-viewer `          |do not open the viewer                   |
 
-例)
+Example)
 ```
 python z9.py malware.ps1 -o sample1.json -s
 ```
 
-## XMLファイルの準備の仕方
-### PowerShellログインを有効にする方法
-1. [`util/enable_powershell_logging.reg`](./util/enable_powershell_logging.reg)を対象端末で右クリックし、「結合」を選択する
-2. 再起動をする
-3. 以降、PowerShellスクリプトを実行するとすべてイベントログに記録される
+## How to prepare the XML file
+### Enable PowerShell Logging
+1. Right-click and merge this registry file:[`util/enable_powershell_logging.reg`](./util/enable_powershell_logging.reg) .
+2. Reboot the PC
+3. All powershell execution will be logged in eventlog
 
-### イベントログからXMLファイルを取得する
-1. [`util/collect_psevent.bat`](./util/collect_psevent.bat)を実行する
-2. `util/log`下にログが生成される
-3. いずれのXMLファイルも本ツールにて精査が可能である
+### Export Eventlog to XML
+1. Execute this batch file:[`util/collect_psevent.bat`](./util/collect_psevent.bat) .
+2. The XML files will be created under `util/log` directory.
+3. Both XML file can be parsed by this tool.
 
-### イベントログを削除する方法
-PowerShellのイベントログはどんどん蓄積されるため、特定のスクリプトのみのログが見たい場合は、一旦過去のログを削除する必要がある。
-* [`util/collect_psevent.bat`](./util/clear_psevent.bat)を管理者権限で実行する
+### How to Delete the Existing Eventlog
+* Execute this batch file:[`util/collect_psevent.bat`](./util/clear_psevent.bat) with "Run as Admin"
 
 
-## 開発者
+## Authors
 [hanataro-miz](https://github.com/hanataro-miz)  
 [si-tm](https://github.com/si-tm)  
 [take32457](https://github.com/take32457)  
