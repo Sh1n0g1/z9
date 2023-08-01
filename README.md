@@ -57,7 +57,7 @@ python z9.py <入力ファイル> -o <output json> -s --no-viewer
 |`input file`            |PowerShell file to be analyzed           |
 |`-o output json`        |filename of z9 result                    |
 |`-s`                     |perform static analysis                      |
-|`--utf8`                 |入力ファイルが`UTF-8`の時に指定する       |
+|`--utf8`                 |specify when the input file is in UTF-8       |
 |`--no-viewer `          |do not open the viewer                   |
 
 Example)
