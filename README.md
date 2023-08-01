@@ -1,32 +1,69 @@
 # z9 PowerShell Log Analyzer
 
-[Japanese](./README_ja.md)
+[Japanese](./README.md)
 
 ![Z9 Logo](./img/logo.png)
 
 ## Abstract
 This tools detects the artifact of the PowerShell based malware from the eventlog of PowerShell logging.
 
-## Online Demo
-[https://z9.shino.club/](https://z9.shino.club/)
-* including Sandbox
-
-## Requirement
-Python 3+
-
 ## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
-cd z9
-pip install -r requirements.txt
 ```
 
 ## How to use
 ```
-python z9.py <XMLfile>
-python z9.py <XMLfile> <output JSONfile>
+usage: z9.py [-h] [--output OUTPUT] [-s] [--no-viewer] [--utf8] input
+
+positional arguments:
+  input                 Input file path
+
+options:
+  -h, --help            show this help message and exit
+  --output OUTPUT, -o OUTPUT
+                        Output file path
+  -s, --static          Enable Static Analysis mode
+  --no-viewer           Disable opening the JSON viewer in a web browser
+  --utf8                Read scriptfile in utf-8 (deprecated)
 ```
-The JSON file can be visualized by `viewer.html`.
+
+
+### Analyze Event Logs (Recommended)
+```
+python z9.py <input file> -o <output json>
+python z9.py <input file> -o <output json> --no-viewer
+```
+|Arguments               |       Meaning                             |
+|-------------------------|----------------------------------------|
+|`input file`            |XML file exported from eventlog          |
+|`-o output json`        |filename of z9 result                    |
+|`--no-viewer `          |do not open the viewer                   |
+
+Example)
+```
+python z9.py util\log\mwpsop.xml -o sample1.json
+```
+
+### Analyze PowerShell File Statically
+* This approach will only do the static analysis and may not provide a proper result especially when the sample is obfuscated.
+```
+python z9.py <入力ファイル> -o <output json> -s
+python z9.py <入力ファイル> -o <output json> -s --utf8
+python z9.py <入力ファイル> -o <output json> -s --no-viewer
+```
+|Arguments               |       Meaning                             |
+|-------------------------|----------------------------------------|
+|`input file`            |PowerShell file to be analyzed           |
+|`-o output json`        |filename of z9 result                    |
+|`-s`                     |perform static analysis                      |
+|`--utf8`                 |入力ファイルが`UTF-8`の時に指定する       |
+|`--no-viewer `          |do not open the viewer                   |
+
+Example)
+```
+python z9.py malware.ps1 -o sample1.json -s
+```
 
 ## How to prepare the XML file
 ### Enable PowerShell Logging
@@ -50,5 +87,3 @@ The JSON file can be visualized by `viewer.html`.
 [Bigdrea6](https://github.com/Bigdrea6)  
 [azaberrypi](https://github.com/azaberrypi)  
 [Sh1n0g1](https://github.com/Sh1n0g1)  
-
-

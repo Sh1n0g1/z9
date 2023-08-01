@@ -33,7 +33,6 @@ class Blacklist2:
         with open('detection/blacklist.csv') as f:
             reader = csv.reader(f)
             for row in reader:
-                # make dictionary
                 self.dic[row[0].strip().lower()] = row[1]
 
     def detect_strings(self, src):

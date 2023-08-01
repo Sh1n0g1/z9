@@ -8,7 +8,6 @@ import datetime
 import webbrowser
 import re
 
-
 DEBUG=False
 
 class Z9:
@@ -173,7 +172,6 @@ def open_viewer_html(viewer, jsonfilename):
                 with open(os.path.splitext(jsonfilename)[0] + ".html","w") as new_viewer:
                     new_viewer.write(replaced_html)
                     webbrowser.open_new(new_viewer.name)
-
 
     except Exception as e:
         print("Error:", e)
