@@ -76,7 +76,7 @@
         }
         //Logistic_Reg
 
-        if(a.logistic_reg >= 0.5){
+        if(a.logistic_reg >= 0.8){
           isMalicious=true;
           html+='<td class="w3-red">' + Math.floor(a.logistic_reg * 100) + "%</td>";
           totalscore+=a.totalscore.totalscore;
@@ -216,5 +216,10 @@
       </div>
     </div>
   </div>
+  <script>
+    if($("#alert_data").text() !== ""){
+      loadJSON();
+    }
+  </script>
 </body>
 </html>

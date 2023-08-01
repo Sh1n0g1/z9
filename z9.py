@@ -5,6 +5,8 @@ from detection import extract_url, detect_sign, detect_iex, detect_strings_black
 from preprocess import source_context
 import argparse
 import datetime
+import webbrowser
+import re
 
 
 DEBUG=False
@@ -25,7 +27,6 @@ class Z9:
   def run_detection(self):
     
     for source in self.sources:
-      #preprocessing
       self.source_context.preprocess(source["sourcecode"])
       all_results = {}
       all_results["eventrecid"] = source['eventrecid']
@@ -74,8 +75,17 @@ class Z9:
 
 def z9_dynamic(xmlfilename, jsonfilename=""):
   #Extract Sourcecode from XML
-  sources=get_eventlog(xmlfilename)
-  
+  try:
+    sources=get_eventlog(xmlfilename)
+  except Exception as e:
+    print(f"xml parse error :{str(e)}")
+    if jsonfilename!='':
+      with open(jsonfilename,'w') as f:
+        report = []
+        report.append({"error" : f"xml parse error :{str(e)}"})
+        json.dump(report,f)
+    return False
+
   z9 = Z9(sources)
   z9.run_detection()
   if jsonfilename!='':
@@ -83,7 +93,16 @@ def z9_dynamic(xmlfilename, jsonfilename=""):
 
 def z9_static(sourcefile,jsonfilename="",encoding="utf-16"):
   #Read script from script file
-  source = get_script(sourcefile,encoding)
+  try:
+    source = get_script(sourcefile,encoding)
+  except Exception as e:
+    print(f"Failed to open the file :{str(e)}")
+    if jsonfilename!='':
+      with open(jsonfilename,'w') as f:
+        report = []
+        report.append({"error" : f"Failed to open the file :{str(e)}"})
+        json.dump(report,f)
+    return False
   sourcecode = {}
   sourcecode["sourcecode"] = source
   sourcecode["time"] = {"SystemTime" : datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f000Z%Z')}
@@ -97,22 +116,18 @@ def z9_static(sourcefile,jsonfilename="",encoding="utf-16"):
 def get_script(sourcefile,encoding):
   if os.path.isfile(sourcefile):
     try:
-        with open(sourcefile,"r",encoding = encoding) as f:
+        with open(sourcefile,"r",encoding=encoding) as f:
             sourcecode = f.read()
-    except Exception as e:
-      print("File read error")
-      print("If the file exists, check the encoding")
-      print(e)
-      exit()
+    except:
+      raise 
     return sourcecode
   else:
-    print("file not found")
-    exit()
+    raise Exception("file not found")
 
 def get_eventlog(filename):
   if not os.path.isfile(filename):
     print('Not found:%s' % filename)
-    exit(1)
+    raise FileNotFoundError("file not found")
   ns='{http://schemas.microsoft.com/win/2004/08/events/event}'  #namespace
   f = open(filename, 'r', encoding='utf-16')
   xml=f.read()
@@ -135,6 +150,35 @@ def get_eventlog(filename):
         sources.append({"sourcecode":ps[0].text, "time":time, "eventrecid": eventrecid})
   return sources
 
+def open_viewer_html(viewer, jsonfilename):
+    if not (os.path.isfile(viewer) and os.path.isfile(jsonfilename)):
+        print("File not found")
+        exit(1)
+
+    try:
+        with open(viewer, "r") as f_html, open(jsonfilename, "r") as f_json:
+            html = f_html.read()
+            json_data = f_json.read()
+
+            textarea_pattern = r'(<textarea[^>]*id="alert_data"[^>]*>)([\s\S]*?)(<\/textarea>)'
+            match = re.search(textarea_pattern, html, re.IGNORECASE)
+            if match:
+                
+                start_tag = match.group(1)
+                end_tag = match.group(3)
+                
+                replacement = f'{start_tag}{json_data}{end_tag}'
+                replaced_html = html.replace(match.group(0), replacement)
+
+                with open(os.path.splitext(jsonfilename)[0] + ".html","w") as new_viewer:
+                    new_viewer.write(replaced_html)
+                    webbrowser.open_new(new_viewer.name)
+
+
+    except Exception as e:
+        print("Error:", e)
+
+
 if __name__ == '__main__':
   print('''
  ______                                          ___  
@@ -144,18 +188,26 @@ if __name__ == '__main__':
 /_____|/___|/___|/___|/___|/___|/___|/___|/___|   /_/ 
 ''')
   parser = argparse.ArgumentParser()
-  parser.add_argument("sourcefile", help="Input file path")
+  parser.add_argument("input", help="Input file path")
   parser.add_argument("--output", "-o", help="Output file path", default="output.json")
   parser.add_argument("-s", "--static", help="Enable Static Analysis mode", action="store_true")
+  parser.add_argument("--no-viewer", help="Disable opening the JSON viewer in a web browser", action="store_true")
+  
   parser.add_argument("--utf8", help="Read scriptfile in utf-8 (deprecated)", action="store_true")
   args = parser.parse_args()
 
   if args.static:
       print("Called static")
-      z9_static(args.sourcefile, args.output, "utf-8" if args.utf8 else "utf-16")
+      z9_static(args.input, args.output, "utf-8" if args.utf8 else "utf-16")
   else:
       if args.utf8:
           print("Warning: --utf8 option is only valid with -s option.")
           exit()
       print("Called dynamic")
-      z9_dynamic(args.sourcefile, args.output)
+      z9_dynamic(args.input, args.output)
+
+  if not args.no_viewer:
+    try:
+      open_viewer_html("./viewer.html",args.output)
+    except Exception as e:
+       print(str(e))
