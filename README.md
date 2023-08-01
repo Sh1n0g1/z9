@@ -48,9 +48,9 @@ python z9.py util\log\mwpsop.xml -o sample1.json
 ### Analyze PowerShell File Statically
 * This approach will only do the static analysis and may not provide a proper result especially when the sample is obfuscated.
 ```
-python z9.py <入力ファイル> -o <output json> -s
-python z9.py <入力ファイル> -o <output json> -s --utf8
-python z9.py <入力ファイル> -o <output json> -s --no-viewer
+python z9.py <input file> -o <output json> -s
+python z9.py <input file> -o <output json> -s --utf8
+python z9.py <input file> -o <output json> -s --no-viewer
 ```
 |Arguments               |       Meaning                             |
 |-------------------------|----------------------------------------|
