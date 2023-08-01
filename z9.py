@@ -7,9 +7,6 @@ import argparse
 import datetime
 import webbrowser
 import re
-import tempfile
-import time
-
 
 DEBUG=False
 
@@ -129,7 +126,7 @@ def get_script(sourcefile,encoding):
 def get_eventlog(filename):
   if not os.path.isfile(filename):
     print('Not found:%s' % filename)
-    exit(1)
+    raise FileNotFoundError("file not found")
   ns='{http://schemas.microsoft.com/win/2004/08/events/event}'  #namespace
   f = open(filename, 'r', encoding='utf-16')
   xml=f.read()
@@ -172,14 +169,9 @@ def open_viewer_html(viewer, jsonfilename):
                 replacement = f'{start_tag}{json_data}{end_tag}'
                 replaced_html = html.replace(match.group(0), replacement)
 
-                with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".html") as temp_file:
-                    temp_file.write(replaced_html)
-                    temp_file_path = temp_file.name
-
-                webbrowser.open_new(temp_file_path)
-
-                time.sleep(3)
-                os.remove(temp_file_path)
+                with open(os.path.splitext(jsonfilename)[0] + ".html","w") as new_viewer:
+                    new_viewer.write(replaced_html)
+                    webbrowser.open_new(new_viewer.name)
 
     except Exception as e:
         print("Error:", e)

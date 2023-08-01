@@ -8,6 +8,7 @@ class DetectSign(DetectionEngine):
 
     def run_detection(self,source_context):
         try:
+            #Detect the rate of symbols (too high -> obfuscated ->malicious)
             sign_num = len(re.findall(r'[^\s0-9a-zA-z]|`', source_context.source))
             src_len = len(source_context.source)
             ret_val = sign_num / src_len

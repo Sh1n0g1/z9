@@ -7,11 +7,7 @@ class DetectionEngine:
         self.error = False
 
     def run_detection(self):
-        # 検知エンジンの実行
-        # sourcecodeを入力として受け取り、検知結果を返す
-        
-        # 検知ロジックの実装
-        # ...
+        #Implementation of detection logic
         pass
 
 

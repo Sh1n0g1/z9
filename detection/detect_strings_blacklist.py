@@ -36,6 +36,7 @@ class Blacklist2:
                 self.dic[row[0].strip().lower()] = row[1]
 
     def detect_strings(self, src):
+        #extract the black listed strings
         words = []
         src_small = src.lower()
         for word in self.dic.keys():

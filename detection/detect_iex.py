@@ -7,6 +7,7 @@ class DetectIEX(DetectionEngine):
       self.name="detect_iex"
 
   def run_detection(self,source_context):
+      #Detect the iex/Invoke-Expression string
       try:
           target = ["iex", "invoke-expression"]
           self.result = False

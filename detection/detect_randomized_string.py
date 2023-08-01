@@ -8,6 +8,7 @@ class DetectRandomizedString(DetectionEngine):
 
     def run_detection(self,source_context):
         try:
+            #detect randomized string like this; ELidMQDtIk
             randomized_string_count = 0.0
             names = []
 
