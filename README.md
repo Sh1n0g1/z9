@@ -1,6 +1,6 @@
 # z9 PowerShell Log Analyzer
 
-[Japanese](./README.md)
+[Japanese](./README-ja.md)
 
 ![Z9 Logo](./img/logo.png)
 
