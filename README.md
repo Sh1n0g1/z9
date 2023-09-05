@@ -6,7 +6,7 @@
 
 ## Abstract
 This tools detects the artifact of the PowerShell based malware from the eventlog of PowerShell logging.
-
+[Online Demo](https://z9.shino.club/)
 ## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
