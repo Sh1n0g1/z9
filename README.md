@@ -5,7 +5,7 @@
 ![Z9 Logo](./img/logo.png)
 
 ## Abstract
-This tools detects the artifact of the PowerShell based malware from the eventlog of PowerShell logging.
+This tools detects the artifact of the PowerShell based malware from the eventlog of PowerShell logging.  
 [Online Demo](https://z9.shino.club/)
 ## Install
 ```
