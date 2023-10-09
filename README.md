@@ -10,6 +10,8 @@ This tools detects the artifact of the PowerShell based malware from the eventlo
 ## Install
 ```
 git clone https://github.com/Sh1n0g1/z9
+cd z9
+pip install -r requirements.txt
 ```
 
 ## How to use
