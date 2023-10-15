@@ -51,6 +51,11 @@
       position: absolute;
       right: 4rem;
       top:0;
+    }#break_line{
+      font-size: large;
+      position: absolute;
+      right: 10rem;
+      top:0;
     }
   </style>
   <script>
@@ -137,9 +142,11 @@
     function openSourceCode(e){
       const modal = document.getElementById('modal-wrapper');
       const copyButton = document.getElementById('copy');
+      const break_lineButton = document.getElementById('break_line');
       modal.style.display='block';
       modal.addEventListener("click",closeSourceCode);
       copyButton.addEventListener("click",copy);
+      break_lineButton.addEventListener("click",break_line);
       
       const sourcecode=decodeURI($(e).data('source'));
       $("#sourcecode").text(sourcecode);
@@ -159,6 +166,15 @@
       target.innerHTML = 'Copied!';
       setTimeout(() => target.innerHTML = 'Copy', 1500);
     }
+
+    function break_line(){
+      const target = event.target;
+      target.innerText = 'Broke!';
+      setTimeout(() => target.innerText = 'Break', 1500);
+      const temp_html_string = $("#sourcecode").html()
+      $("#sourcecode").html(temp_html_string.replaceAll(";",";<wbr>"));
+    }
+
   </script>
 </head>
 <body>
@@ -205,6 +221,7 @@
       <div class="modal">
         <div class="modal-content">
           <div class="w3-container modal-header">
+            <span id="break_line" onclick="break_line()" class="w3-button">Break</span>
             <span id="copy" onclick="copy()" class="w3-button">Copy</span>
             <span onclick="document.getElementById('modal-wrapper').style.display='none'" class="w3-button w3-display-topright">&times;</span>
             <h3>Source Code</h3>
