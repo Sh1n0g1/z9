@@ -42,7 +42,7 @@ class LogisticReg(DetectionEngine):
     def train_and_predict(self,source):
         train_scripts = load_files(self.TRAIN_SCRIPTS)
         X_train, Y_train = train_scripts.data, train_scripts.target
-        model = make_pipeline(TfidfVectorizer(token_pattern="(?u)\\b\\w[\\w|-]{1,30}\\b", min_df=4), LogisticRegression(C=10, max_iter=1000))
+        model = make_pipeline(TfidfVectorizer(token_pattern="(?u)\\b\\w[\\w|-]{1,30}\\b", min_df=10, max_df=218), LogisticRegression(C= 0.993371178836922, max_iter=96202))
         model.fit(X_train, Y_train)
         with open(self.MODEL_FILE, "wb") as f:
             pickle.dump(model, f)
