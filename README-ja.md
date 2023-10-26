@@ -8,6 +8,8 @@ PowerShellロギングのイベントログのXMLファイルからマルウェ�
 ## インストール
 ```
 git clone https://github.com/Sh1n0g1/z9
+cd z9
+pip install -r requirements.txt
 ```
 
 ## 使い方
